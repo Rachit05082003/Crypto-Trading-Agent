@@ -1,4 +1,4 @@
-# AI Trading Bot
+# RL Trading Bot
 
 A real-time Crypto trading application powered by Deep Q-Learning (DQN) that simulates trading strategies with live price data.
 
@@ -120,3 +120,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 
 This application is for educational purposes only. Trading cryptocurrencies involves significant risk. Do not use this system for actual trading without thorough testing and risk management strategies. 
+
