@@ -1,0 +1,172 @@
+// Chart data
+let priceChart = null;
+let chartData = {
+    timestamps: [],
+    prices: [],
+    trades: []
+};
+
+// Initialize the chart
+function initializeChart() {
+    console.log("Initializing price chart");
+    const ctx = document.getElementById('priceChart');
+    
+    if (!ctx) {
+        console.error("Chart canvas element not found!");
+        return;
+    }
+    
+    try {
+        priceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Price',
+                    data: [],
+                    borderColor: '#a3be8c',
+                    backgroundColor: 'rgba(163, 190, 140, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.1,
+                    fill: true,
+                    pointRadius: 0
+                }, {
+                    label: 'Buy',
+                    data: [],
+                    backgroundColor: '#a3be8c',
+                    borderColor: '#a3be8c',
+                    pointRadius: 8,
+                    pointStyle: 'triangle',
+                    showLine: false
+                }, {
+                    label: 'Sell',
+                    data: [],
+                    backgroundColor: '#bf616a',
+                    borderColor: '#bf616a',
+                    pointRadius: 8,
+                    pointStyle: 'triangle',
+                    showLine: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.1)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(200, 200, 200, 0.1)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+        
+        console.log("Chart initialized successfully");
+    } catch (error) {
+        console.error("Error initializing chart:", error);
+    }
+}
+
+// Update chart with new price data
+function updateChartData(prices) {
+    console.log("Updating chart data with", prices.length, "points");
+    
+    // Clear old data if we have too many points
+    if (chartData.timestamps.length > 300) {
+        chartData.timestamps = chartData.timestamps.slice(-300);
+        chartData.prices = chartData.prices.slice(-300);
+        chartData.trades = chartData.trades.slice(-300);
+    }
+    
+    // Track if we added any new data
+    let dataAdded = false;
+    
+    // Add new price data
+    prices.forEach(price => {
+        const timestamp = price.timestamp;
+        const value = parseFloat(price.price);
+        
+        // Only add if it's a new timestamp or if we don't have any data yet
+        if (chartData.timestamps.length === 0 || !chartData.timestamps.includes(timestamp)) {
+            chartData.timestamps.push(timestamp);
+            chartData.prices.push(value);
+            chartData.trades.push(price.trades || []);
+            dataAdded = true;
+            console.log(`Added price point: ${timestamp}, price: ${value}, trades: ${price.trades ? price.trades.length : 0}`);
+        }
+    });
+    
+    if (dataAdded) {
+        console.log(`Chart data updated, now have ${chartData.timestamps.length} points`);
+        // Update the chart after adding new data
+        refreshChart();
+    }
+}
+
+// Refresh the chart display
+function refreshChart() {
+    if (!priceChart) {
+        console.error("Chart not initialized!");
+        return;
+    }
+    
+    try {
+        console.log("Refreshing chart with", chartData.timestamps.length, "data points");
+        
+        // Update the chart data
+        priceChart.data.labels = chartData.timestamps;
+        priceChart.data.datasets[0].data = chartData.prices;
+        
+        // Clear existing buy/sell data
+        const buyData = [];
+        const sellData = [];
+        
+        // Add buy and sell markers
+        for (let i = 0; i < chartData.timestamps.length; i++) {
+            const trades = chartData.trades[i] || [];
+            for (const trade of trades) {
+                if (trade.action === 'buy') {
+                    buyData.push({
+                        x: chartData.timestamps[i],
+                        y: chartData.prices[i]
+                    });
+                } else if (trade.action === 'sell') {
+                    sellData.push({
+                        x: chartData.timestamps[i],
+                        y: chartData.prices[i]
+                    });
+                }
+            }
+        }
+        
+        priceChart.data.datasets[1].data = buyData;
+        priceChart.data.datasets[2].data = sellData;
+        
+        // Update the chart
+        priceChart.update();
+        console.log("Chart refreshed successfully with", buyData.length, "buy points and", sellData.length, "sell points");
+    } catch (error) {
+        console.error("Error refreshing chart:", error);
+    }
+}
+
+// Initialize when the document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    initializeChart();
+}); 
