@@ -1,8 +1,8 @@
-# AI Bitcoin Trading Bot
+# AI Trading Bot
 
-A real-time Bitcoin trading application powered by Deep Q-Learning (DQN) that simulates trading strategies with live price data.
+A real-time Crypto trading application powered by Deep Q-Learning (DQN) that simulates trading strategies with live price data.
 
-![Bitcoin Trading Bot]
+![Cryptocurrency Trading Bot]
 ## Features
 
 - **Real-time Price Data**: Fetches live Bitcoin prices from Yahoo Finance
@@ -117,5 +117,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Yahoo Finance for providing real-time price data
 
 ## Disclaimer
+
 
 This application is for educational purposes only. Trading cryptocurrencies involves significant risk. Do not use this system for actual trading without thorough testing and risk management strategies. 
